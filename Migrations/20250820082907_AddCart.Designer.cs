@@ -11,8 +11,8 @@ using TinyFeetBackend.Data;
 namespace TinyFeetBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250813102203_AddCategoryAndProductRelation")]
-    partial class AddCategoryAndProductRelation
+    [Migration("20250820082907_AddCart")]
+    partial class AddCart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace TinyFeetBackend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("TinyFeetBackend.Entities.Cart.Cart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("TinyFeetBackend.Entities.Cart.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CartId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("TinyFeetBackend.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -32,16 +76,30 @@ namespace TinyFeetBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Toys"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Kids Accessories"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Clothing"
+                        });
                 });
 
             modelBuilder.Entity("TinyFeetBackend.Entities.Product", b =>
@@ -111,6 +169,33 @@ namespace TinyFeetBackend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TinyFeetBackend.Entities.Cart.Cart", b =>
+                {
+                    b.HasOne("TinyFeetBackend.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TinyFeetBackend.Entities.Cart.CartItem", b =>
+                {
+                    b.HasOne("TinyFeetBackend.Entities.Cart.Cart", null)
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TinyFeetBackend.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("TinyFeetBackend.Entities.Product", b =>
                 {
                     b.HasOne("TinyFeetBackend.Entities.Category", "Category")
@@ -118,6 +203,11 @@ namespace TinyFeetBackend.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("TinyFeetBackend.Entities.Cart.Cart", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("TinyFeetBackend.Entities.Category", b =>

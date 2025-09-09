@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using TinyFeetBackend.Data;
 using TinyFeetBackend.Entities;
 using TinyFeetBackend.Repositories.Interface;
@@ -7,44 +8,29 @@ namespace TinyFeetBackend.Repositories.Implementations
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly AppDbContext _context;
-
-        public ProductRepository(AppDbContext context)
+        private readonly AppDbContext _dbContext;
+        private readonly IMapper _mapper;
+        public ProductRepository(AppDbContext vagueVaultDbContext, IMapper mapper)
         {
-            _context = context;
+            _dbContext = vagueVaultDbContext;
+            _mapper = mapper;
         }
 
-        public async Task<List<Product>> GetAllAsync()
+        public async Task<IEnumerable<Product>?> GetByCategoryId(int id)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .ToListAsync();
+            var result = await _dbContext.Products.Where(p => p.CategoryId == id).ToListAsync();
+            if (result == null) return null;
+
+            return result;
         }
 
-        public async Task<Product?> GetByIdAsync(int id)
+        public async Task<Product?> GetByProductId(int id)
         {
-            return await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var data = await _dbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if (data == null) return null;
+            return data;
+
         }
 
-        public async Task<Product> CreateAsync(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return product;
-        }
-
-        public async Task UpdateAsync(Product product)
-        {
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(Product product)
-        {
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-        }
     }
 }

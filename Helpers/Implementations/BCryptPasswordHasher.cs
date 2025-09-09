@@ -1,6 +1,6 @@
 ﻿using TinyFeetBackend.Helpers.Interfaces;
 
-namespace TinyFeetBackend.Helpers
+namespace TinyFeetBackend.Helpers.Implementations
 {
     public class BCryptPasswordHasher : IPasswordHasher
     {

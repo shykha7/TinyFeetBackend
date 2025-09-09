@@ -4,7 +4,6 @@ namespace TinyFeetBackend.DTOs.Auth
 {
     public class UserRegistrationDto
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "Username is required.")]
         [StringLength(50,MinimumLength =5, ErrorMessage = "Username cannot be longer than 100 characters.")]
@@ -19,6 +18,7 @@ namespace TinyFeetBackend.DTOs.Auth
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be at least 8 characters.")]
         public string Password { get; set; } = string.Empty;
+
 
         [Required(ErrorMessage = "Confirm Password is required.")]
         [Compare("Password", ErrorMessage = "Passwords do not match.")]

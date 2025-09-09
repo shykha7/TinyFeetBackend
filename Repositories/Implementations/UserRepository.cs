@@ -34,7 +34,7 @@ namespace TinyFeetBackend.Repositories.Implementations
 
         public async Task CreateUserAsync(User user)
         {
-             _context.Users.AddAsync(user);
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
         }
@@ -43,6 +43,37 @@ namespace TinyFeetBackend.Repositories.Implementations
         {
             return await _context.Users.AnyAsync();
         }
+
+
+        public async Task<IEnumerable<object>> GetAllUsersAsync()
+        {
+            var users = await _context.Users.ToListAsync();
+
+            return users.Select(u => new {
+                Id = u.Id,
+                Name = u.Username ?? "",
+                Email = u.Email ?? "",
+                Status = u.IsBlocked ? "Blocked" : "Active",
+                IsAdmin = u.Role == "Admin",
+                IsBlocked = u.IsBlocked 
+            });
+        }
+
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
+        public async Task<bool> ToggleBlockUserAsync(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+
+            user.IsBlocked = !user.IsBlocked; 
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
 
     }
 }

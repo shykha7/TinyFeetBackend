@@ -18,9 +18,9 @@ namespace TinyFeetBackend.DTOs.Products
         [Range(0, int.MaxValue)]
         public int Stock { get; set; }
 
-        [Url]
         public string? ImageUrl { get; set; }
 
         public string? CategoryName { get; set; }
+        public int? CategoryId { get; set; }
     }
 }

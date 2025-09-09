@@ -18,9 +18,9 @@ namespace TinyFeetBackend.DTOs.Products
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative")]
         public int Stock { get; set; }
 
-        public int? CategoryId { get; set; }
+        public string? CategoryName { get; set; }
 
-        [Url(ErrorMessage = "ImageUrl must be a valid URL")]
-        public string? ImageUrl { get; set; }
+         public int? CategoryId { get; set; }
+        public IFormFile? Image { get; set; }
     }
 }

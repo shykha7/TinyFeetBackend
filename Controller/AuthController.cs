@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TinyFeetBackend.DTOs.Auth;
+using TinyFeetBackend.Repositories.Interface;
 using TinyFeetBackend.Services.Auth;
 
 
@@ -10,10 +11,12 @@ namespace TinyFeetBackend.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IUserRepository userRepository)
         {
             _authService = authService;
+            _userRepository = userRepository;
         }
 
         
@@ -30,7 +33,6 @@ namespace TinyFeetBackend.Controllers
             return Ok(result);
         }
 
-        
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
         {
@@ -39,9 +41,20 @@ namespace TinyFeetBackend.Controllers
 
             var result = await _authService.LoginAsync(loginDto);
             if (result == null)
+            {
+                // You might want to check if the user exists and is blocked
+                // to provide more specific error messages
+                var user = await _userRepository.GetUserByNameAsync(loginDto.Username);
+                if (user != null && user.IsBlocked)
+                {
+                    return Unauthorized(new { message = "Account is blocked. Please contact administrator." });
+                }
+
                 return Unauthorized(new { message = "Invalid username or password." });
+            }
 
             return Ok(result);
         }
     }
-}
+  }
+

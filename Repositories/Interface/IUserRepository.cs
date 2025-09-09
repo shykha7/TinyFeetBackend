@@ -9,5 +9,9 @@ namespace TinyFeetBackend.Repositories.Interface
         Task<bool> UserExistsAsync(string username, string email);
         Task CreateUserAsync(User user);
         Task<bool> AnyUsersExistAsync();
+
+        Task<IEnumerable<object>> GetAllUsersAsync();
+        Task<User?> GetUserByIdAsync(int id);
+        Task<bool> ToggleBlockUserAsync(int id);
     }
 }

@@ -11,8 +11,8 @@ using TinyFeetBackend.Data;
 namespace TinyFeetBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250813100131_Product")]
-    partial class Product
+    [Migration("20250816043408_InitialState")]
+    partial class InitialState
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,16 +32,30 @@ namespace TinyFeetBackend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Toys"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Kids Accessories"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Clothing"
+                        });
                 });
 
             modelBuilder.Entity("TinyFeetBackend.Entities.Product", b =>

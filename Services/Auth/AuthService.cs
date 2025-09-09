@@ -29,14 +29,19 @@ namespace TinyFeetBackend.Services.Auth
                 return null!;
             }
 
-           
+            // ADD THIS CHECK - Prevent login if user is blocked
+            if (user.IsBlocked)
+            {
+                _logger.LogWarning("Login failed: User account is blocked ({Username})", loginDto.Username);
+                return null!;
+            }
+
             if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
                 _logger.LogWarning("Login failed: Incorrect password for {Username}", loginDto.Username);
                 return null!;
             }
 
-         
             var token = _jwtHelper.GetJwtToken(user);
 
             var response = new AuthResponseDto
@@ -45,10 +50,11 @@ namespace TinyFeetBackend.Services.Auth
                 {
                     Id = user.Id,
                     Username = user.Username,
-                    Email = user.Email
+                    Email = user.Email,
+                    Role = user.Role,
                 },
                 Token = token,
-                Expiration = DateTime.UtcNow.AddMinutes(60) 
+                Expiration = DateTime.UtcNow.AddMinutes(60)
             };
 
             return response;
@@ -68,7 +74,7 @@ namespace TinyFeetBackend.Services.Auth
                 Username = registerDto.Username,
                 Email = registerDto.Email,
                 Password = hashedPassword,
-                Role = "User"
+                Role = role
             };
 
             await _userRepository.CreateUserAsync(newUser);
@@ -83,7 +89,8 @@ namespace TinyFeetBackend.Services.Auth
                 {
                     Id = newUser.Id,
                     Username = newUser.Username,
-                    Email = newUser.Email
+                    Email = newUser.Email,
+                    Role = newUser.Role
                 },
                 Token = token,
                 Expiration = DateTime.UtcNow.AddMinutes(60) 
